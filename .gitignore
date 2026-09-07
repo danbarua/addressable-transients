@@ -225,3 +225,6 @@ __marimo__/
 .AppleDouble
 .LSOverride
 ._*
+
+# Labkit Datastore
+.labkit/
