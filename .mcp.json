@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "labkit": {
+      "type": "stdio",
+      "command": "labkit",
+      "args": ["mcp"]
+    }
+  }
+}

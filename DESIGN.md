@@ -7,10 +7,13 @@ This repository is a new record. It does not inherit questions, graphs,
 datasets, statistics, figures, or conclusions from any other
 oscillator-network programme.
 
-**Status.** Review-0: accept with amendments (2026-09-07). Amendments
-1a–1e, 2a–2c, 3a–3c are applied below. Nothing in this document is an
-established finding. Arc 0 harness work may proceed in parallel. No Arc 1
-number is a finding until the locks here have been implemented as written.
+**Status.** Review-0: accept with amendments (2026-09-07), amendments
+1a–1e, 2a–2c, 3a–3c applied. Follow-up review (2026-09-07, later):
+threshold justifications restated per use, S2 cutoffs given the same
+treatment, combination rule written. Nothing in this document is an
+established finding. Arc 0 harness work may proceed in parallel. No
+Arc 1 number is a finding until the locks here have been implemented
+as written.
 
 ---
 
@@ -26,8 +29,11 @@ identities dressed as measurements. The amendments below are the
 minimum that makes each written number capable of being false.
 
 Review text is the Review-0 note of 2026-09-07 (amendments 1a–1e,
-2a–2c, 3a–3c). This file is the applied form, not a pointer that
-requires the conversation to exist.
+2a–2c, 3a–3c). A later pass the same day required per-use cutoff
+justifications and a combination rule; those are in the locks
+tables, the $\sigma$ paragraph, and “Combination rule.” This file
+is the applied form, not a pointer that requires the conversation
+to exist.
 
 ---
 
@@ -196,7 +202,19 @@ is a new design.
 | Draw order | (1) $N-\lvert C\rvert$ out-of-cluster phases in index order; (2) $N$ amplitudes in index order $0\ldots N-1$. Cluster phases then overwritten to $0$. |
 | Meter (primary) | amplitude-weighted order on $C$: $\displaystyle R_C(x)=\Bigl\lVert\frac{\sum_{j\in C}x_j}{\sum_{j\in C}\lvert x_j\rvert}\Bigr\rVert$ if the denominator is nonzero, else $0$ |
 | Meter (reported diagnostic) | unweighted $R_C^{\mathrm{u}}(x)=\bigl\lVert\,\lvert C\rvert^{-1}\sum_{j\in C}e^{i\arg x_j}\bigr\rVert$ |
-| Threshold $\sigma$ | $0.8$. On 100 independent uniform phases the expected unweighted order is $\sim 1/\sqrt{100}=0.1$; $0.8$ leaves an eightfold margin for controls. Chosen here, not inherited. |
+| Threshold $\sigma$ | $0.8$ (fire line; justification below, not in this cell) |
+
+$\sigma=0.8$ is the meter's fire line: $R_C>\sigma$ means the
+address bit is on. It is the same line at every time and under
+every operator because the three S1 primaries ask whether that
+same bit is on, not whether a random-phase null has been beaten.
+Why $0.8$ rather than $0.3$: a fully aligned cluster has $R_C=1$;
+$0.8$ is a high-coherence line, not a significance line. The
+random-phase scale $1/\sqrt{\lvert C\rvert}=0.1$ only shows that
+$0.8$ is far from an unstructured population. It does not, by
+itself, justify the cutoff on $x(0)$, $x(T_{\mathrm{off}})$, or a
+wrong-switchboard state. Those uses are earned in the paragraph
+below. Chosen here, not inherited.
 
 The primary meter is amplitude-weighted so that the amplitude cells
 can enter the off-time reading. The $T=T_\star$ reading of a
@@ -204,6 +222,24 @@ phase-coherent cluster is still $\approx 1$ in both meters; that
 reading is Arc 0, not the S1 primary. Excursion cells are reported
 only for the off-time and wrong-switchboard rates, not as a
 $T=T_\star$ story (amendment 1e).
+
+**Why the same $\sigma$ on three non-random populations.**
+
+- At $t=0$: $x(0)=e^{-MT_\star}x^\star$ is a deterministic
+  function of the target. The check is not “is this unlike uniform
+  phases?” It is “does the meter already call this a cluster?” If
+  backward evolution leaves $R_C(x(0))>\sigma$, the cause *is*
+  already the pattern and primary #2 fails. That is the intended
+  failure, not a mismatch of null distributions.
+- At $T_{\mathrm{off}}$: the check is whether the address bit is
+  on at a time nobody asked for. Same bit, same line.
+- Under $M'$: the check is whether a design computed from the
+  wrong coupling still turns the bit on at $T_\star$ when run on
+  the right coupling. Same bit, same line.
+
+No pre-confirmatory sweep is used to move $\sigma$. If the
+confirmatory rates sit on the knife-edge of $0.8$, the pass rules
+are applied as written; $\sigma$ is not edited after seeing them.
 
 ### S2 locks
 
@@ -221,12 +257,27 @@ $T=T_\star$ story (amendment 1e).
 | Requested nodes $j$ | $\{0,\;15,\;136,\;255\}$ — corner, opposite corner of the first row, interior, last index |
 | Target perturbation | $\delta^\star=e_j$ (standard basis), one $j$ per trial |
 | Energy share | $q_i(\delta)=\delta_i^2\big/\sum_k\delta_k^2$ if $\lVert\delta\rVert_2>0$, else $0$ |
-| Control threshold | $0.25$ |
-| Nonstationarity floor $c$ | $0.20$ |
+| Control threshold $q_\star$ | $0.25$ (justification below) |
+| Nonstationarity floor $c$ | $0.20$ (justification below) |
 | Floor statistic | $\lVert J(\theta(T))-J(\theta(t_0))\rVert_F\big/\lVert J(\theta(t_0))\rVert_F$ |
 | Frozen map | $\Phi_{\mathrm{fr}}=\exp\bigl(J(\theta(t_0))\,T\bigr)$ |
 | Random control | i.i.d. real Gaussian vector, rescaled to $\lVert u\rVert_2$, independent stream `default_rng(10_000+seed)` |
 | Integrator | as Arc 0 |
+
+$q_\star=0.25$: on 256 nodes a uniform share is
+$1/256\approx 0.0039$. A node holding $0.25$ has $\approx 64$ times
+that share, equivalent to the target being one of at most four
+equal-energy sites. That is the definition of “the requested node
+was addressed” for a control that is supposed to miss. It is not a
+random-phase calculation and is not borrowed from $\sigma$.
+
+$c=0.20$: a global phase rotation leaves $J$ invariant, so the
+floor statistic measures relative-phase rearrangement, not a drift
+of the origin. $c=0.20$ means the routing matrix moved by a fifth
+of its own Frobenius size: large enough that $\Phi_{\mathrm{fr}}$
+and $\Phi$ are distinct operators, small enough that ordinary
+mixing on a 4-regular grid can pass. Baselines below $c$ are not
+evidence about a moving switchboard.
 
 **Eligibility (amendment 2a).** A baseline seed is eligible for S2
 only if its floor statistic is $\ge c$. Ineligible seeds are
@@ -285,11 +336,11 @@ per eligible baseline and per $j\in\{0,15,136,255\}$.
 
 1. **Random impulse.** $u_{\mathrm{rand}}$ of equal Euclidean
    norm to $u=\Phi^{-1}e_j$, evolved by $\Phi$. Fraction of
-   (eligible seed, $j$) trials with $q_j\ge 0.25$.
+   (eligible seed, $j$) trials with $q_j\ge q_\star$.
    Pass: $\le 2/N_{\mathrm{trials}}$ where
    $N_{\mathrm{trials}}=N_{\mathrm{eligible}}\times 4$.
 2. **Frozen $J(t_0)$.** $u_{\mathrm{fr}}=\Phi_{\mathrm{fr}}^{-1}e_j$,
-   evolved by the true $\Phi$. Fraction with $q_j\ge 0.25$.
+   evolved by the true $\Phi$. Fraction with $q_j\ge q_\star$.
    Pass: $\le 2/N_{\mathrm{trials}}$.
 
 These two are not folded. (1) can pass while (2) fails: addressable
@@ -300,6 +351,26 @@ bookkeeping miss.
 
 If $N_{\mathrm{eligible}}<6$, report the floor statistics and
 stop. Do not draw extra seeds.
+
+### Combination rule
+
+There is no omnibus “addressability” verdict across substrates.
+S1 and S2 are different machines.
+
+- **S1 addressability** holds if and only if primaries #1, #2, and
+  #3 all pass on the primary amplitude cell. One failure and S1
+  addressability is not established.
+- **S2 random-control claim** holds if and only if S2 scientific
+  number (1) passes and $N_{\mathrm{eligible}}\ge 6$.
+- **S2 switchboard claim** holds if and only if S2 scientific
+  number (2) passes and $N_{\mathrm{eligible}}\ge 6$.
+  These two S2 claims are not folded: (1) can hold without (2).
+- $N_{\mathrm{eligible}}<6$ makes both S2 claims **inconclusive**,
+  not false.
+- Rates are compared to the integers as written. $5/20$ fails an
+  $\le 4/20$ rule. There is no marginal band and no rounding.
+- Excursion cells, unweighted meters, the disjoint-block diagnostic,
+  and the matched-norm random S1 report do not enter any verdict.
 
 ---
 
